@@ -3,8 +3,9 @@ import { FaInstagram, FaTiktok } from "react-icons/fa";
 import { FaFacebookF, FaXTwitter } from "react-icons/fa6";
 
 export const StyledNewsletterSection = styled.section`
-  border: 4px solid var(--background-color-dark);
   border-radius: 12px;
+  background-color: var(--background-color-dark);
+  color: var(--background-color-light);
   text-align: center;
   margin: 1.2rem 1.2rem;
   padding: 1.563rem;
@@ -30,16 +31,16 @@ export const StyledNewsletterSection = styled.section`
   input[type="email"] {
     flex: 1;
     padding: 0.4rem 0.5rem;
-    background-color: transparent;
+    background-color: var(--background-color-light);
     line-height: 1.5;
-    border: 2px solid var(--background-color-dark);
+    border: 2px solid var(--background-color-light);
     border-radius: var(--border-radius);
     box-sizing: border-box;
     margin-right: 0.5rem;
 
     &:focus {
       outline: none;
-      background: transparent;
+      /* background: transparent; */
       border: 2px solid var(--primary-color);
     }
   }
@@ -48,8 +49,9 @@ export const StyledNewsletterSection = styled.section`
     padding: 0.4rem 0.8rem;
     border-radius: var(--border-radius);
     border: 1px solid transparent;
-    background-color: var(--text-color);
-    color: #fff;
+
+    background-color: var(--background-color-light);
+    color: var(--text-color);
     line-height: 1.5;
     cursor: pointer;
   }
@@ -61,10 +63,10 @@ export const StyledInstagramIcon = styled(FaInstagram)`
   display: inline-block;
   vertical-align: middle;
   margin: 0 0.25rem;
-  transition: color 0.3s ease;
+  transition: transform 0.3s ease;
 
   &:hover {
-    color: var(--primary-color);
+    transform: scale(1.2);
   }
 `;
 
@@ -74,11 +76,10 @@ export const StyledTikTokIcon = styled(FaTiktok)`
   display: inline-block;
   vertical-align: middle;
   margin: 0 0.25rem;
-
-  transition: color 0.3s ease;
+  transition: transform 0.3s ease;
 
   &:hover {
-    color: var(--primary-color);
+    transform: scale(1.2);
   }
 `;
 
@@ -88,11 +89,11 @@ export const StyledXIcon = styled(FaXTwitter)`
   display: inline-block;
   vertical-align: middle;
   margin: 0 0.25rem;
-
-  transition: color 0.3s ease;
+  color: var(--background-color-light);
+  transition: transform 0.3s ease;
 
   &:hover {
-    color: var(--primary-color);
+    transform: scale(1.2);
   }
 `;
 
@@ -102,10 +103,9 @@ export const StyledFacebookIcon = styled(FaFacebookF)`
   display: inline-block;
   vertical-align: middle;
   margin: 0 0.25rem;
-
-  transition: color 0.3s ease;
+  transition: transform 0.3s ease;
 
   &:hover {
-    color: var(--primary-color);
+    transform: scale(1.2);
   }
 `;
