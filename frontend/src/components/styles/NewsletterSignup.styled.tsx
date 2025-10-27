@@ -109,3 +109,8 @@ export const StyledFacebookIcon = styled(FaFacebookF)`
     transform: scale(1.2);
   }
 `;
+
+export const StyledStatusMessage = styled.p`
+  margin-top: 1rem;
+  font-style: italic;
+`;

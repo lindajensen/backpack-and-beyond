@@ -37,3 +37,7 @@ export const StyledForm = styled.form`
     border-radius: var(--border-radius);
   }
 `;
+
+export const StyledStatusMessage = styled.p`
+  font-style: italic;
+`;

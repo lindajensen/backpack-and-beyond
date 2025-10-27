@@ -2,6 +2,7 @@
 import express, { Request, Response, response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import MailerLite from "@mailerlite/mailerlite-nodejs";
 
 // Config
 dotenv.config();
@@ -10,14 +11,16 @@ dotenv.config();
 import { Client } from "pg";
 
 // Types
-import { Post } from "../frontend/src/types/index";
-import { Article } from "../frontend/src/types/index";
 import { CityLink } from "../frontend/src/types/index";
 import { City } from "../frontend/src/types/index";
 
 // App Instances and Middleware
 const app = express();
 const port = 8080;
+
+const mailerlite = new MailerLite({
+  api_key: process.env.MAILERLITE_API_KEY,
+});
 
 app.use(cors());
 app.use(express.json());
@@ -33,99 +36,6 @@ client
   .catch((err) => console.error("Database connection error:", err));
 
 // ROUTES --------------------------------------------------
-//! GET /posts - Retrieve all posts
-// app.get("/posts", async (request: Request, response: Response) => {
-//   try {
-//     const result = await client.query<Post>("SELECT * FROM posts");
-
-//     const posts = result.rows;
-//     response.status(200).send(posts);
-//   } catch (error) {
-//     console.log("Error fetching posts:", error);
-//     response.status(500).send({ message: "Something went wrong" });
-//   }
-// });
-
-//! GET /posts/featured - Retreive featured posts
-// app.get("/posts/featured", async (request: Request, response: Response) => {
-//   try {
-//     const result = await client.query<Post>(
-//       `SELECT * FROM Posts
-//        WHERE is_featured = true
-//       `
-//     );
-
-//     const featuredPosts = result.rows;
-//     response.status(200).send(featuredPosts);
-//   } catch (error) {
-//     console.log("Error fetching posts:", error);
-//     response.status(500).send({ message: "Something went wrong" });
-//   }
-// });
-
-//! GET /posts/:id - Retrieve specific post
-// app.get("/posts/:id", async (request: Request, response: Response) => {
-//   try {
-//     const result = await client.query<Post>(
-//       `
-//       SELECT *
-//       FROM posts
-//       WHERE id = $1
-//       `,
-//       [request.params.id]
-//     );
-
-//     const post = result.rows[0];
-
-//     if (result.rows.length === 0) {
-//       response.status(404).send({ message: "Post not found" });
-//     } else {
-//       response.status(200).send(post);
-//     }
-//   } catch (error) {
-//     console.log("Error fetching post:", error);
-//     response.status(500).send({ message: "Something went wrong" });
-//   }
-// });
-
-//! GET /articles - Retrieve all articles
-// app.get("/articles", async (request: Request, response: Response) => {
-//   try {
-//     const result = await client.query<Article>("SELECT * FROM articles");
-
-//     const articles = result.rows;
-//     response.status(200).send(articles);
-//   } catch (error) {
-//     console.log("Error fetching articles:", error);
-//     response.status(500).send({ message: "Something went wrong" });
-//   }
-// });
-
-//! GET /articles/:id - Retrieve specific article
-// app.get("/articles/:id", async (request: Request, response: Response) => {
-//   try {
-//     const result = await client.query<Article>(
-//       `
-//       SELECT *
-//       FROM articles
-//       WHERE id = $1
-//       `,
-//       [request.params.id]
-//     );
-
-//     const article = result.rows[0];
-
-//     if (result.rows.length === 0) {
-//       response.status(404).send({ message: "Article not found" });
-//     } else {
-//       response.status(200).send(article);
-//     }
-//   } catch (error) {
-//     console.log("Error fetching article:", error);
-//     response.status(500).send({ message: "Something went wrong" });
-//   }
-// });
-
 // GET /cities - Retrieve all cities with their IDs, names, and slugs
 app.get("/cities", async (request, response) => {
   try {
@@ -198,24 +108,34 @@ app.get("/cities/:slug", async (request, response) => {
   }
 });
 
-// app.get("/cities/:slug", async (request, response) => {
-//   try {
-//     const result = await client.query<City>(
-//       `
-//       SELECT *
-//       FROM cities
-//       WHERE slug = $1
-//       `,
-//       [request.params.slug]
-//     );
+// POST /api/subscribe - Subscribe to newsletter
+app.post("/api/subscribe", async (request, response) => {
+  const { email } = request.body;
 
-//     const city = result.rows[0];
-//     response.status(200).send(city);
-//   } catch (error) {
-//     console.log("Error fetching city:", error);
-//     response.status(500).send({ message: "Something went wrong" });
-//   }
-// });
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!email) {
+    response.status(400).json({ error: "Email address is required" });
+  }
+
+  if (!emailRegex.test(email)) {
+    response.status(400).json({ error: "Please enter a valid email address" });
+    return;
+  }
+
+  try {
+    await mailerlite.subscribers.createOrUpdate({
+      email: email,
+      status: "active",
+      groups: ["169413242807911810"],
+    });
+
+    response.json({ success: true });
+  } catch (error) {
+    console.error("MailerLite error:", error);
+    response.status(500).send({ error: "Failed to subscribe" });
+  }
+});
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
