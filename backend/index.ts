@@ -18,8 +18,11 @@ import { City } from "../frontend/src/types/index";
 const app = express();
 const port = 8080;
 
+
+}
+
 const mailerlite = new MailerLite({
-  api_key: process.env.MAILERLITE_API_KEY,
+  api_key: process.env.MAILERLITE_API_KEY || "",
 });
 
 app.use(cors());
