@@ -13,8 +13,6 @@ import {
   StyledFooterNewsletterForm,
 } from "./styles/Footer.styled";
 
-import { StyledFormWrapper } from "./styles/Global";
-
 function Footer() {
   return (
     <>
@@ -56,9 +54,7 @@ function Footer() {
             Subscribe to get new posts and travel tips straight to your inbox!
           </p>
 
-          <StyledFormWrapper>
-            <StyledFooterNewsletterForm />
-          </StyledFormWrapper>
+          <StyledFooterNewsletterForm />
 
           <div>
             <StyledFooterSocials>
