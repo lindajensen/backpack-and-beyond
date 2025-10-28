@@ -101,11 +101,3 @@ export const StyledHeading = styled.div`
     margin: 0;
   }
 `;
-
-export const StyledFormWrapper = styled.div`
-  /* margin: 0 auto;
-
-  @media (min-width: 900px) {
-    margin: 0;
-  } */
-`;
