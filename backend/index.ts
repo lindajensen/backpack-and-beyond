@@ -3,6 +3,8 @@ import express, { Request, Response, response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import MailerLite from "@mailerlite/mailerlite-nodejs";
+import nodemailer from "nodemailer";
+import type SMTPTransport from "nodemailer/lib/smtp-transport";
 
 // Config
 dotenv.config();
@@ -134,6 +136,49 @@ app.post("/api/subscribe", async (request, response) => {
   } catch (error) {
     console.error("MailerLite error:", error);
     response.status(500).send({ error: "Failed to subscribe" });
+  }
+});
+
+// POST /api/contact - Send contact form
+app.post("/api/contact", async (request, response) => {
+  const { firstName, lastName, company, email, subject, message } =
+    request.body;
+
+  if (!firstName || !lastName || !email || !message) {
+    response.status(400).json({ error: "Required fields missing" });
+    return;
+  }
+
+  try {
+    // Create transporter
+    const transporter = nodemailer.createTransport({
+      service: "icloud",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD,
+      },
+    } as SMTPTransport.Options);
+
+    // Send email
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: process.env.EMAIL_USER,
+      replyTo: email,
+      subject: subject || `New message from ${firstName} ${lastName}`,
+      text: `
+        Name: ${firstName} ${lastName}
+        Email: ${email}
+        Company: ${company || "Not Available"}
+
+        Message:
+        ${message}
+`,
+    });
+
+    response.status(200).json({ success: true });
+  } catch (error) {
+    console.error("Email error:", error);
+    response.status(500).json({ error: "Failed to send message" });
   }
 });
 
