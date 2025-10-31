@@ -1,7 +1,5 @@
 import { Link } from "react-router-dom";
 
-// import NewsletterForm from "./NewsletterForm";
-
 import { FaInstagram, FaTiktok } from "react-icons/fa";
 import { FaFacebookF, FaXTwitter } from "react-icons/fa6";
 
