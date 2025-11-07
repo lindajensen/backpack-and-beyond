@@ -15,11 +15,44 @@ function ContactPage() {
   const [email, setEmail] = useState("");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
+  const [status, setStatus] = useState(""); // "loading", "success", "error"
 
-  function handleSubmit(e: React.ChangeEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.ChangeEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    console.log(firstName);
+    try {
+      const response = await fetch("http://localhost:8080/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          company,
+          email,
+          subject,
+          message,
+        }),
+      });
+
+      if (response.ok) {
+        setStatus("success");
+
+        // Clear UI
+        setFirstName("");
+        setLastName("");
+        setCompany("");
+        setEmail("");
+        setSubject("");
+        setMessage("");
+      } else {
+        setStatus("error");
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+      setStatus("error");
+    }
   }
 
   return (
@@ -92,6 +125,9 @@ function ContactPage() {
         ></textarea>
 
         <input type="submit" value="Send" />
+
+        {status === "success" && <p>Message sent successfully!</p>}
+        {status === "error" && <p>Failed to send message. Please try again.</p>}
       </StyledContactForm>
     </StyledContactSection>
   );
