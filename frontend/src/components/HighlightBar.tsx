@@ -5,7 +5,7 @@ import { client } from "../client";
 import { Post } from "../types";
 import { Article } from "../types";
 
-import { StyledHighlightBarSection } from "./styles/HighligtBar.styled";
+import { StyledHighlightBarSection } from "./styles/HighlightBar.styled";
 
 function HighlightBar() {
   const [latestPost, setLatestPost] = useState<Post | null>(null);

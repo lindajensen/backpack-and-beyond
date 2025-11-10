@@ -48,6 +48,10 @@ export const StyledHighlightBarSection = styled.section`
         text-decoration: underline;
         text-underline-offset: 6px;
       }
+
+      &:visited {
+        color: inherit;
+      }
     }
   }
 `;
