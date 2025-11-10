@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { client } from "../client";
 
-import { CityWithLocations, Location } from "../types";
+import { Location } from "../types";
 
 import {
   StyledLocationsSection,
@@ -9,28 +10,41 @@ import {
   StyledLocationDetails,
 } from "./styles/Locations.styled";
 
+import { StyledFallbackText } from "./styles/Global";
+
 function RestaurantsSection() {
   const { slug } = useParams();
-  const [city, setCity] = useState<CityWithLocations | null>(null);
   const [restaurants, setRestaurants] = useState<Location[]>([]);
 
   useEffect(() => {
-    fetch(`http://localhost:8080/cities/${slug}`)
-      .then((response) => response.json())
-      .then((data: CityWithLocations) => {
-        setCity(data);
-
-        const filteredRestaurants = data.locations.filter(
-          (location) => location.type === "restaurant"
-        );
-
-        setRestaurants(filteredRestaurants);
-      })
-      .catch((error: unknown) => console.log("Error loading city", error));
+    client
+      .fetch(
+        `*[_type == "location" && city->slug.current == $slug && type == "restaurant"]{
+          _id,
+          name,
+          type,
+          address,
+          description,
+          link,
+          mainImage {
+            asset-> {
+              url
+            },
+            alt
+          },
+        }`,
+        { slug }
+      )
+      .then((data: Location[]) => setRestaurants(data))
+      .catch((error) => console.log("Error loading restaurants:", error));
   }, [slug]);
 
-  if (!city) {
-    return <p>We tried to find this place, but even the GPS gave up.</p>;
+  if (!slug) {
+    return (
+      <StyledFallbackText>
+        Loading city data... the map is still unfolding.
+      </StyledFallbackText>
+    );
   }
 
   return (
@@ -44,12 +58,12 @@ function RestaurantsSection() {
       ) : (
         <ul>
           {restaurants.map((restaurant) => (
-            <li key={restaurant.id}>
+            <li key={restaurant._id}>
               <article>
                 <div>
                   <img
-                    src={`http://localhost:8080/${restaurant.image}`}
-                    alt={restaurant.name}
+                    src={restaurant.mainImage.asset.url}
+                    alt={restaurant.mainImage.alt}
                   />
                 </div>
 

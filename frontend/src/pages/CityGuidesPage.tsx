@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { client } from "../client";
 
 import { CityLink } from "../types";
 
@@ -10,11 +11,16 @@ function CityGuidesPage() {
   const [cities, setCities] = useState<CityLink[]>([]);
 
   useEffect(() => {
-    fetch("http://localhost:8080/cities")
-      .then((response) => response.json())
-      .then((data: CityLink[]) => {
-        setCities(data);
-      });
+    client
+      .fetch(
+        `*[_type == "city"] {
+          _id,
+          name,
+          slug
+        }`
+      )
+      .then((data: CityLink[]) => setCities(data))
+      .catch((error: unknown) => console.log(error));
   }, []);
 
   return (
@@ -25,8 +31,8 @@ function CityGuidesPage() {
 
       <ul>
         {cities.map((city) => (
-          <li key={city.id}>
-            <Link to={`/city-guides/${city.slug}`}>{city.name}</Link>
+          <li key={city._id}>
+            <Link to={`/city-guides/${city.slug.current}`}>{city.name}</Link>
           </li>
         ))}
       </ul>
@@ -35,5 +41,3 @@ function CityGuidesPage() {
 }
 
 export default CityGuidesPage;
-
-// https://anywhereweroam.com/cuba/
