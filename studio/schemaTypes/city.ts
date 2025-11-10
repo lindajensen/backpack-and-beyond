@@ -25,9 +25,20 @@ export default defineType({
       title: 'Country',
     }),
     defineField({
-      name: 'image',
+      name: 'mainImage',
+      title: 'Main image',
       type: 'image',
-      title: 'Main Image',
+      options: {
+        hotspot: true,
+      },
+      fields: [
+        {
+          name: 'alt',
+          title: 'Alt text',
+          type: 'string',
+          description: 'Describe the image for accessibility and SEO',
+        },
+      ],
     }),
     defineField({
       name: 'description',

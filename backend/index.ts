@@ -37,79 +37,9 @@ client
   .then(() => console.log("Connected to PostgreSQL"))
   .catch((err) => console.error("Database connection error:", err));
 
+// TODO - Remove unused types and interfaces
+
 // ROUTES --------------------------------------------------
-// GET /cities - Retrieve all cities with their IDs, names, and slugs
-app.get("/cities", async (request, response) => {
-  try {
-    const result = await client.query<CityLink>(
-      "SELECT id, name, slug FROM cities"
-    );
-
-    const cities = result.rows;
-    response.status(200).send(cities);
-  } catch (error) {
-    console.log("Error fetching cities:", error);
-    response.status(500).send({ message: "Something went wrong" });
-  }
-});
-
-// GET /cities - Retrieve all cities with their IDs, names, and slugs
-app.get("/cities", async (request, response) => {
-  try {
-    const result = await client.query<CityLink>(
-      "SELECT id, name, slug FROM cities"
-    );
-
-    const cities = result.rows;
-    response.status(200).send(cities);
-  } catch (error) {
-    console.log("Error fetching cities:", error);
-    response.status(500).send({ message: "Something went wrong" });
-  }
-});
-
-// GET /cities/:slug - Retrieve specific city and its locations
-app.get("/cities/:slug", async (request, response) => {
-  try {
-    const result = await client.query<City>(
-      `
-      SELECT
-        cities.id,
-        cities.name,
-        cities.slug,
-        cities.country,
-        cities.description,
-        cities.image,
-        COALESCE(
-          json_agg(
-            json_build_object(
-              'id', locations.id,
-              'name', locations.name,
-              'type', locations.type,
-              'address', locations.address,
-              'description', locations.description,
-              'image', locations.image,
-              'link', locations.link
-            )
-          ) FILTER (WHERE locations.id IS NOT NULL),
-          '[]'
-        ) AS locations
-      FROM cities
-      LEFT JOIN locations ON locations.city_id = cities.id
-      WHERE cities.slug = $1
-      GROUP BY cities.id;
-      `,
-      [request.params.slug]
-    );
-
-    const city = result.rows[0];
-    response.status(200).send(city);
-  } catch (error) {
-    console.log("Error fetching city:", error);
-    response.status(500).send({ message: "Something went wrong" });
-  }
-});
-
 // POST /api/subscribe - Subscribe to newsletter
 app.post("/api/subscribe", async (request, response) => {
   const { email } = request.body;

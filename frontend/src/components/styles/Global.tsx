@@ -102,4 +102,19 @@ export const StyledHeading = styled.div`
   }
 `;
 
-
+export const StyledFallbackText = styled.p`
+  text-align: center;
+  background-color: var(--background-color-dark);
+  color: var(--background-color-light);
+  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.2rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-family: var(--font-family-subheadings);
+  margin: 3rem 1.2rem;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+`;

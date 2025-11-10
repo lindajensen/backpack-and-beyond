@@ -16,6 +16,12 @@ export default defineType({
       title: 'Name',
     }),
     defineField({
+      name: 'slug',
+      type: 'slug',
+      title: 'Slug',
+      options: {source: 'name', maxLength: 96},
+    }),
+    defineField({
       name: 'type',
       type: 'string',
       title: 'Type',
@@ -41,9 +47,20 @@ export default defineType({
       title: 'Description',
     }),
     defineField({
-      name: 'image',
+      name: 'mainImage',
+      title: 'Main image',
       type: 'image',
-      title: 'Image',
+      options: {
+        hotspot: true,
+      },
+      fields: [
+        {
+          name: 'alt',
+          title: 'Alt text',
+          type: 'string',
+          description: 'Describe the image for accessibility and SEO',
+        },
+      ],
     }),
     defineField({
       name: 'link',

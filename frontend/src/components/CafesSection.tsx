@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { client } from "../client";
 
-import { CityWithLocations, Location } from "../types";
+import { Location } from "../types";
 
 import {
   StyledLocationsSection,
@@ -9,28 +10,41 @@ import {
   StyledLocationDetails,
 } from "./styles/Locations.styled";
 
+import { StyledFallbackText } from "./styles/Global";
+
 function CafeSection() {
   const { slug } = useParams();
-  const [city, setCity] = useState<CityWithLocations | null>(null);
   const [cafes, setCafes] = useState<Location[]>([]);
 
   useEffect(() => {
-    fetch(`http://localhost:8080/cities/${slug}`)
-      .then((response) => response.json())
-      .then((data: CityWithLocations) => {
-        setCity(data);
-
-        const filteredCafes = data.locations.filter(
-          (location) => location.type === "café"
-        );
-
-        setCafes(filteredCafes);
-      })
-      .catch((error: unknown) => console.log("Error loading city", error));
+    client
+      .fetch(
+        `*[_type == "location" && city->slug.current == $slug && type == "cafe"]{
+          _id,
+          name,
+          type,
+          address,
+          description,
+          link,
+          mainImage {
+            asset-> {
+              url
+            },
+            alt
+          },
+        }`,
+        { slug }
+      )
+      .then((data: Location[]) => setCafes(data))
+      .catch((error) => console.log("Error loading attractions:", error));
   }, [slug]);
 
-  if (!city) {
-    return <p>We tried to find this place, but even the GPS gave up.</p>;
+  if (!slug) {
+    return (
+      <StyledFallbackText>
+        Loading city data... the map is still unfolding.
+      </StyledFallbackText>
+    );
   }
 
   return (
@@ -45,12 +59,12 @@ function CafeSection() {
       ) : (
         <ul>
           {cafes.map((cafe) => (
-            <li key={cafe.id}>
+            <li key={cafe._id}>
               <article>
                 <div>
                   <img
-                    src={`http://localhost:8080/${cafe.image}`}
-                    alt={cafe.name}
+                    src={cafe.mainImage.asset.url}
+                    alt={cafe.mainImage.alt}
                   />
                 </div>
 

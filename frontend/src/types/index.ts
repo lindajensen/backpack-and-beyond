@@ -83,29 +83,41 @@ export interface City {
   name: string;
   slug: string;
   country: string;
-  image: string;
+  mainImage: {
+    asset: {
+      url: string;
+    };
+    alt?: string;
+  };
   description: string;
 }
 
 export interface Location {
-  id: number;
+  _id: number;
   city_id: number;
   name: string;
   type: string;
   address?: string;
   description?: string;
-  image?: string;
+  mainImage: {
+    asset: {
+      url: string;
+    };
+    alt?: string;
+  };
   link?: string;
 }
 
-export interface CityWithLocations extends City {
-  locations: Location[];
-}
+// export interface CityWithLocations extends City {
+//   locations: Location[];
+// }
 
 export interface CityLink {
-  id: number;
+  _id: number;
   name: string;
-  slug: string;
+  slug: {
+    current: string;
+  };
 }
 
 export interface NextTripInterface {

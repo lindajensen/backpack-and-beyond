@@ -1,35 +1,50 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { client } from "../client";
 
-import { CityWithLocations, Location } from "../types";
+import { Location } from "../types";
+
 import {
   StyledLocationsSection,
   StyledFallbackMessage,
   StyledLocationDetails,
 } from "./styles/Locations.styled";
 
+import { StyledFallbackText } from "./styles/Global";
+
 function MuseumsSection() {
   const { slug } = useParams();
-  const [city, setCity] = useState<CityWithLocations | null>(null);
   const [museums, setMuseums] = useState<Location[]>([]);
 
   useEffect(() => {
-    fetch(`http://localhost:8080/cities/${slug}`)
-      .then((response) => response.json())
-      .then((data: CityWithLocations) => {
-        setCity(data);
-
-        const filteredMuseums = data.locations.filter(
-          (location) => location.type === "museum"
-        );
-
-        setMuseums(filteredMuseums);
-      })
-      .catch((error: unknown) => console.log("Error loading city", error));
+    client
+      .fetch(
+        `*[_type == "location" && city->slug.current == $slug && type == "museum"]{
+          _id,
+          name,
+          type,
+          address,
+          description,
+          link,
+          mainImage {
+            asset-> {
+              url
+            },
+            alt
+          },
+        }`,
+        { slug }
+      )
+      .then((data: Location[]) => setMuseums(data))
+      .catch((error) => console.log("Error loading museums:", error));
   }, [slug]);
 
-  if (!city) {
-    return <p>We tried to find this place, but even the GPS gave up.</p>;
+  if (!slug) {
+    return (
+      <StyledFallbackText>
+        Loading city data... the map is still unfolding.
+      </StyledFallbackText>
+    );
   }
 
   return (
@@ -43,12 +58,12 @@ function MuseumsSection() {
       ) : (
         <ul>
           {museums.map((museum) => (
-            <li key={museum.id}>
+            <li key={museum._id}>
               <article>
                 <div>
                   <img
-                    src={`http://localhost:8080/${museum.image}`}
-                    alt={museum.name}
+                    src={museum.mainImage.asset.url}
+                    alt={museum.mainImage.alt}
                   />
                 </div>
 

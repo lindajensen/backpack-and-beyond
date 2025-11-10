@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { client } from "../client";
 
 import { City } from "../types";
 
@@ -18,27 +19,47 @@ import {
   StyledAnchorLinks,
 } from "../components/styles/CityGuideDetailsPage.styled";
 
+import { StyledFallbackText } from "../components/styles/Global";
+
 function CityGuideDetailsPage() {
   const { slug } = useParams();
   const [city, setCity] = useState<City | null>(null);
 
   useEffect(() => {
-    fetch(`http://localhost:8080/cities/${slug}`)
-      .then((response) => response.json())
-      .then((data: City) => {
-        setCity(data);
-        console.log(data);
-      })
-      .catch((error: unknown) => console.log("Error loading city", error));
+    client
+      .fetch(
+        `*[slug.current == "${slug}"]{
+          _id,
+          name,
+          "slug": slug.current,
+          country,
+          description,
+          mainImage {
+            asset-> {
+              url
+            },
+            alt
+          }
+        }`
+      )
+      .then((data) => setCity(data[0]))
+      .catch((error: unknown) => console.log(error));
   }, [slug]);
 
   if (!city) {
-    return <p>We tried to find this place, but even the GPS gave up.</p>;
+    return (
+      <StyledFallbackText>
+        We tried to find this place, but even the GPS gave up.
+      </StyledFallbackText>
+    );
   }
 
   return (
     <StyledCityGuideDetailsSection>
-      <StyledHeroImage src={`http://localhost:8080/${city.image}`} alt="" />
+      <StyledHeroImage
+        src={city.mainImage.asset.url}
+        alt={city.mainImage.alt}
+      />
 
       <StyledCityHeader>
         <h1>{city.name} City Guide</h1>

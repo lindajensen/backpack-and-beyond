@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { client } from "../client";
 
-import { CityWithLocations, Location } from "../types";
+import { Location } from "../types";
 
 import {
   StyledLocationsSection,
@@ -9,28 +10,41 @@ import {
   StyledLocationDetails,
 } from "./styles/Locations.styled";
 
+import { StyledFallbackText } from "./styles/Global";
+
 function HotelsSection() {
   const { slug } = useParams();
-  const [city, setCity] = useState<CityWithLocations | null>(null);
   const [hotels, setHotels] = useState<Location[]>([]);
 
   useEffect(() => {
-    fetch(`http://localhost:8080/cities/${slug}`)
-      .then((response) => response.json())
-      .then((data: CityWithLocations) => {
-        setCity(data);
-
-        const filteredHotels = data.locations.filter(
-          (location) => location.type === "hotel"
-        );
-
-        setHotels(filteredHotels);
-      })
-      .catch((error: unknown) => console.log("Error loading city", error));
+    client
+      .fetch(
+        `*[_type == "location" && city->slug.current == $slug && type == "hotel"]{
+          _id,
+          name,
+          type,
+          address,
+          description,
+          link,
+          mainImage {
+            asset-> {
+              url
+            },
+            alt
+          },
+        }`,
+        { slug }
+      )
+      .then((data: Location[]) => setHotels(data))
+      .catch((error) => console.log("Error loading hotels:", error));
   }, [slug]);
 
-  if (!city) {
-    return <p>We tried to find this place, but even the GPS gave up.</p>;
+  if (!slug) {
+    return (
+      <StyledFallbackText>
+        Loading city data... the map is still unfolding.
+      </StyledFallbackText>
+    );
   }
 
   return (
@@ -44,12 +58,12 @@ function HotelsSection() {
       ) : (
         <ul>
           {hotels.map((hotel) => (
-            <li key={hotel.id}>
+            <li key={hotel._id}>
               <article>
                 <div>
                   <img
-                    src={`http://localhost:8080/${hotel.image}`}
-                    alt={hotel.name}
+                    src={hotel.mainImage.asset.url}
+                    alt={hotel.mainImage.alt}
                   />
                 </div>
 
