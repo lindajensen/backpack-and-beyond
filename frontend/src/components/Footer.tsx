@@ -5,6 +5,7 @@ import { FaFacebookF, FaXTwitter } from "react-icons/fa6";
 
 import {
   StyledTopFooter,
+  StyledFooterColumn,
   StyledFooterSocials,
   StyledFooterBrandLink,
   StyledBottomFooter,
@@ -25,7 +26,7 @@ function Footer() {
           </p>
         </div>
 
-        <div>
+        <StyledFooterColumn>
           <h4>Explore</h4>
           <ul>
             <li>
@@ -44,7 +45,7 @@ function Footer() {
               <Link to="/contact">Contact</Link>
             </li>
           </ul>
-        </div>
+        </StyledFooterColumn>
 
         <div>
           <h4>Stay Updated</h4>

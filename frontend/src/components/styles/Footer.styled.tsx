@@ -24,6 +24,12 @@ export const StyledTopFooter = styled.footer`
   }
 `;
 
+export const StyledFooterColumn = styled.div`
+  li {
+    margin-bottom: 0.5rem;
+  }
+`;
+
 export const StyledFooterSocials = styled.ul`
   display: flex;
   gap: 0.625rem;
