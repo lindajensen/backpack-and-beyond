@@ -28,7 +28,6 @@ export const StyledFooterSocials = styled.ul`
   display: flex;
   gap: 0.625rem;
   justify-content: center;
-  margin-top: 1rem;
 
   @media (min-width: 900px) {
     justify-content: left;
