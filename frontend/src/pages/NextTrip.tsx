@@ -5,9 +5,12 @@ import { NextTripInterface, Slide } from "../types";
 
 import CountDownTimer from "../components/CountDownTimer";
 import FlickityCarousel from "../components/FlickityCarousel";
-import NewsletterForm from "../components/NewsletterForm";
+import { StyledStatusMessage } from "../components/styles/NewletterForm.styled";
 
-import { StyledNextTripSection } from "../components/styles/NextTrip.styled";
+import {
+  StyledNextTripSection,
+  StyledNewsletterContent,
+} from "../components/styles/NextTrip.styled";
 import { StyledHeading } from "../components/styles/Global";
 
 function NextTrip() {
@@ -15,7 +18,9 @@ function NextTrip() {
   const [nextTripData, setNextTripData] = useState<NextTripInterface | null>(
     null
   );
-  // const [nextTripData, setNextTripData] = useState<NextTripInterface[]>([]);
+  const [email, setEmail] = useState("");
+  const [emailStatus, setEmailStatus] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     client
@@ -47,6 +52,48 @@ function NextTrip() {
     return <p>No upcoming trip planned...yet! Check back soon.</p>;
   }
 
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    function clearStatus() {
+      setTimeout(() => {
+        setEmailStatus("");
+        setErrorMessage("");
+      }, 5000);
+    }
+
+    try {
+      const response = await fetch("http://localhost:8080/api/subscribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setEmailStatus("success");
+        setEmail("");
+      } else {
+        setEmailStatus("error");
+        setErrorMessage(data.error || "Something went wrong");
+      }
+
+      clearStatus();
+    } catch (error) {
+      console.error("Error:", error);
+      setEmailStatus("error");
+      setErrorMessage("Something went wrong, please try again.");
+      clearStatus();
+    }
+  }
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setEmail(e.target.value);
+  }
+
   return (
     <StyledNextTripSection>
       <StyledHeading>
@@ -56,10 +103,27 @@ function NextTrip() {
       <CountDownTimer departureDate={nextTripData.departureDate} />
 
       <FlickityCarousel slides={nextTripSlides} />
-      {/* <CountDownTimer departureDate={nextTripData.departureDate} /> */}
 
-      <h3>Subscribe to get notified when the story drops</h3>
-      <NewsletterForm />
+      <StyledNewsletterContent>
+        <h3>Subscribe to get notified when the story drops</h3>
+        <form onSubmit={handleSubmit}>
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onInput={handleChange}
+            placeholder="Your email"
+          />
+          <input type="submit" value="Subscribe" />
+        </form>
+
+        {emailStatus === "success" && (
+          <StyledStatusMessage>Thank you for subscribing!</StyledStatusMessage>
+        )}
+        {emailStatus === "error" && (
+          <StyledStatusMessage>{errorMessage}</StyledStatusMessage>
+        )}
+      </StyledNewsletterContent>
     </StyledNextTripSection>
   );
 }

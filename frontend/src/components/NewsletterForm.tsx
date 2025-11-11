@@ -10,6 +10,13 @@ function NewsletterForm({ className }: { className?: string }) {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
+    function clearStatus() {
+      setTimeout(() => {
+        setEmailStatus("");
+        setErrorMessage("");
+      }, 5000);
+    }
+
     try {
       const response = await fetch("http://localhost:8080/api/subscribe", {
         method: "POST",
@@ -28,10 +35,13 @@ function NewsletterForm({ className }: { className?: string }) {
         setEmailStatus("error");
         setErrorMessage(data.error || "Something went wrong");
       }
+
+      clearStatus();
     } catch (error) {
       console.error("Error:", error);
       setEmailStatus("error");
       setErrorMessage("Something went wrong, please try again.");
+      clearStatus();
     }
   }
 
